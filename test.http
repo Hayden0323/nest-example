@@ -1,0 +1,10 @@
+@uri=http://localhost:3000
+
+###
+GET {{uri}}/cats
+
+###
+POST {{uri}}/cats
+
+###
+Get {{uri}}/docs?5
