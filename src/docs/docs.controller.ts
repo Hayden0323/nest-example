@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect, Query } from '@nestjs/common';
+import { Controller, Get, Redirect, Query } from '@nestjs/common'
 
 @Controller('docs')
 export class DocsController {
@@ -6,7 +6,7 @@ export class DocsController {
   @Redirect('https://docs.nestjs.com', 302)
   getDocs(@Query('version') version) {
     if (version && version === '5') {
-      return { url: 'https://docs.nestjs.com/v5/' };
+      return { url: 'https://docs.nestjs.com/v5/' }
     }
   }
 }
