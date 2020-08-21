@@ -12,4 +12,8 @@ export class CatsService {
   findAll(): Cat[] {
     return this.cats
   }
+
+  findOne(age): Cat {
+    return this.cats.find(cat => cat.age === age)
+  }
 }

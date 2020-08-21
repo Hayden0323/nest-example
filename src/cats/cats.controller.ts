@@ -13,7 +13,8 @@ import {
   Res,
   HttpStatus,
   HttpException,
-  UseFilters
+  UseFilters,
+  UsePipes
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { CreateCatDto } from './dto/create-cat.dto'
@@ -22,15 +23,21 @@ import { CatsService } from './cats.service'
 import { Cat } from './interfaces/cat.interface'
 import { ForbiddenException } from 'src/exception/forbidden.exception'
 import { HttpExceptionFilter } from 'src/exception/http-exception.filter'
+import { JoiValidationPipe } from 'src/pipe/joi-validation.pipe'
+import { createCatSchema } from './schema/create-cat.schema'
+import { ValidationPipe } from 'src/pipe/validation.pipe'
+import { ParseIntPipe } from 'src/pipe/parse-int.pipe'
 
 @Controller('cats')
-@UseFilters(new HttpExceptionFilter())
+// @UseFilters(new HttpExceptionFilter())
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Post()
+  // @UsePipes(new JoiValidationPipe(createCatSchema))
+  @UsePipes(new ValidationPipe())
   async create(@Body() createCatDto: CreateCatDto) {
-    throw new ForbiddenException()
+    // throw new ForbiddenException()
     this.catsService.create(createCatDto)
   }
 
@@ -45,7 +52,7 @@ export class CatsController {
     //   { status: HttpStatus.FORBIDDEN, error: 'This is a custom message' },
     //   403
     // )
-    throw new ForbiddenException()
+    // throw new ForbiddenException()
     return this.catsService.findAll()
   }
 
@@ -55,8 +62,8 @@ export class CatsController {
   // }
 
   @Get(':id')
-  findOne(@Param('id') id): string {
-    return `This action return a #${id} cat`
+  async findOne(@Param('id', new ParseIntPipe()) id) {
+    return await this.catsService.findOne(id)
   }
 
   @Put(':id')
