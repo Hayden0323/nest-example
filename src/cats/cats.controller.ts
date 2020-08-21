@@ -11,18 +11,27 @@ import {
   Put,
   Delete,
   Res,
-  HttpStatus
+  HttpStatus,
+  HttpException,
+  UseFilters
 } from '@nestjs/common'
 import { Request, Response } from 'express'
-import { CreateCatDto } from './create-cat.dto'
-import { UpdateCatDto } from './update-cat.dto'
+import { CreateCatDto } from './dto/create-cat.dto'
+import { UpdateCatDto } from './dto/update-cat.dto'
+import { CatsService } from './cats.service'
+import { Cat } from './interfaces/cat.interface'
+import { ForbiddenException } from 'src/exception/forbidden.exception'
+import { HttpExceptionFilter } from 'src/exception/http-exception.filter'
 
 @Controller('cats')
+@UseFilters(new HttpExceptionFilter())
 export class CatsController {
+  constructor(private readonly catsService: CatsService) {}
+
   @Post()
-  @Header('Cache-Control', 'none')
-  create(@Body() createCatDto: CreateCatDto): string {
-    return 'This action adds a new cat'
+  async create(@Body() createCatDto: CreateCatDto) {
+    throw new ForbiddenException()
+    this.catsService.create(createCatDto)
   }
 
   // @Post()
@@ -31,9 +40,13 @@ export class CatsController {
   // }
 
   @Get()
-  @Redirect('https://docs.nestjs.com', 302)
-  findAll(@Req() request: Request): string {
-    return 'This action return all cats'
+  async findAll(): Promise<Cat[]> {
+    // throw new HttpException(
+    //   { status: HttpStatus.FORBIDDEN, error: 'This is a custom message' },
+    //   403
+    // )
+    throw new ForbiddenException()
+    return this.catsService.findAll()
   }
 
   // @Get()
