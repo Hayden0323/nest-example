@@ -14,7 +14,10 @@ import {
   HttpStatus,
   HttpException,
   UseFilters,
-  UsePipes
+  UsePipes,
+  UseGuards,
+  SetMetadata,
+  UseInterceptors
 } from '@nestjs/common'
 import { Request, Response } from 'express'
 import { CreateCatDto } from './dto/create-cat.dto'
@@ -27,15 +30,23 @@ import { JoiValidationPipe } from 'src/pipe/joi-validation.pipe'
 import { createCatSchema } from './schema/create-cat.schema'
 import { ValidationPipe } from 'src/pipe/validation.pipe'
 import { ParseIntPipe } from 'src/pipe/parse-int.pipe'
+import { RolesGuard } from 'src/guard/roles.guard'
+import { Roles } from './decorator/roles.decorator'
+import { LoggingInterceptor } from 'src/interceptor/logging.interceptor'
+import { TransformInterceptor } from 'src/interceptor/transform.interceptor'
+import { ErrorInterceptor } from 'src/interceptor/exception.interceptor'
 
 @Controller('cats')
 // @UseFilters(new HttpExceptionFilter())
+@UseGuards(RolesGuard)
+@UseInterceptors(ErrorInterceptor)
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   @Post()
   // @UsePipes(new JoiValidationPipe(createCatSchema))
   @UsePipes(new ValidationPipe())
+  // @Roles('admin')
   async create(@Body() createCatDto: CreateCatDto) {
     // throw new ForbiddenException()
     this.catsService.create(createCatDto)
